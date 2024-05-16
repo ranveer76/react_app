@@ -3,14 +3,21 @@ import ThemeTemplateData from '../../db/ThemeTemplateData';
 import ResumeContext from '../../Context/ResumeContext';
 import { Box, useColorModeValue, chakra } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
-import ContextMenu from './ContextMenu'; // Adjust the import path as necessary
+import ContextMenu from './ContextMenu';
 import { remove, getDatabase, ref, set } from 'firebase/database';
+import BuilderArea from '../../Pages/BuilderArea';
+import Theme1 from './../../Theme/Theme1/Theme1'
+import Theme2 from './../../Theme/Theme2/Theme2'
+import Theme3 from './../../Theme/Theme3/Theme3'
+import { useReactToPrint } from 'react-to-print';
+import { push } from 'firebase/database';
 
 
 export default function Data() {
-    const { setThemeData, setCurrentTheme, setShowComponent, setSelectedData, data, setData, user } = useContext(ResumeContext);
+    const { setThemeData, currentTheme, setCurrentTheme, setShowComponent, selectedData, setLoading, setUser, setSelectedData, data, setData, user, componentRef, themeData } = useContext(ResumeContext);
     const navigate = useNavigate();
     const [contextMenu, setContextMenu] = useState({ position: null, data: null });
+    const [download, setDownload] = useState(false);
     const color = useColorModeValue('gray.800', 'white');
 
     useEffect(() => {
@@ -74,6 +81,53 @@ export default function Data() {
         }
     }
 
+    const handlePrint = useReactToPrint({
+        content: () => componentRef.current,
+        onBeforePrint: () => {
+            setLoading(true)
+        },
+        onAfterPrint: () => {
+            setLoading(false)
+            const db = getDatabase();
+            if(selectedData === null){
+                push(ref(db, 'users/' + user.uid + '/Data'), {
+                    name: user.name + ' ' + user.data_length,
+                    theme: currentTheme,
+                    data: themeData
+                }).then(
+                    setUser({...user, data_length: user.data_length + 1})
+                ).catch((error) => {
+                    console.error(error);
+                });
+                setData({...data, [user.data_length]: {name:data[selectedData].name, theme: currentTheme, data: themeData}})
+            } else{
+                set(ref(db, 'users/' + user.uid + '/Data/' + selectedData), {
+                    name: data[selectedData].name,
+                    theme: currentTheme,
+                    data: themeData
+                }).catch((error) => {
+                    console.error(error);
+                });
+                setData({...data, [selectedData]: {name:data[selectedData].name, theme: currentTheme, data: themeData}})
+            }
+            setSelectedData(null);
+            setDownload(false);
+        }
+    });
+
+    useEffect(() => {
+        if (download) {
+            handlePrint();
+        }
+    }, [download, handlePrint]);
+
+    const handleDownload = (id) => {
+        setCurrentTheme(data[id].theme);
+        setThemeData(data[id].data);
+        setSelectedData(id);
+        setDownload(true);
+    }
+
     const menuItems = [
         { label: 'Rename', onClick: (e) => {
             handleRename(contextMenu.data);
@@ -81,6 +135,11 @@ export default function Data() {
         { label: 'Delete', onClick: () => {
             handleDelete(contextMenu.data);
         }},
+        {
+            label: 'Download', onClick: () => {
+                handleDownload(contextMenu.data);
+            }
+        },
     ];
 
     return (
@@ -104,6 +163,17 @@ export default function Data() {
                     );
                 })}
             </Box>
+            {
+                (currentTheme === 'Theme1') && 
+                <div style={{display:'none'}}><BuilderArea theme={<Theme1 componentRef={componentRef} themeData={themeData} />} /></div>
+            }
+            {
+                (currentTheme === 'Theme2') && 
+                <div style={{display:'none'}}><BuilderArea theme={<Theme2 componentRef={componentRef} themeData={themeData} />} /></div>
+            }
+            {
+                (currentTheme === 'Theme3') && <div style={{display:'none'}}><BuilderArea theme={<Theme3 componentRef={componentRef} themeData={themeData} />} /></div>
+            }
             <ContextMenu
                 menuItems={menuItems}
                 position={contextMenu.position}
