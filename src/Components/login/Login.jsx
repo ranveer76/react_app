@@ -7,6 +7,7 @@ import { get, getDatabase, ref, set } from "firebase/database"
 import { GoogleAuthProvider } from 'firebase/auth';
 import { signInWithPopup } from 'firebase/auth';
 import { auth } from '../firebase';
+import { sendPasswordResetEmail } from 'firebase/auth';
 
 
 const Login = (props) => {
@@ -59,7 +60,7 @@ const Login = (props) => {
                 const db = getDatabase();
                 get(ref(db, 'users/' + user.uid)).then((snapshot) => {
                     if (snapshot.exists()) {
-                        setUser({...user, data_length: snapshot.val().Data.length})
+                        setUser({...user, data_length: snapshot.val().Data ? snapshot.val().Data.length : 0})
                     }
                 }).catch((error) => {
                     console.error(error);
@@ -115,6 +116,20 @@ const Login = (props) => {
             });
             navigate('/')
     };
+
+    const handleForgotPassword = () => {
+        const email = prompt('Enter your email address');
+        if (email !== null) {
+            sendPasswordResetEmail(auth, email)
+                .then(() => {
+                    alert('Password reset email sent');
+                })
+                .catch((error) => {
+                    console.error(error);
+                    alert('An error occurred. Please try again');
+                });
+        }
+    };
     
 
     return (
@@ -137,10 +152,16 @@ const Login = (props) => {
                                     <button type="submit" className="btn btn-primary btn-block" disabled={loading}>Login</button>
                                 </div>
                                 {error && <p className="text-danger">{error}</p>}
-                                <p>Don't have an account? <Link to="/register" onClick={(e)=>{
-                                    e.preventDefault()
-                                    setSignup(true)
-                                }}>Register</Link></p>
+                                <div className='text-center' style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                                    <p>Don't have an account? <Link to="/register" onClick={(e)=>{
+                                        e.preventDefault()
+                                        setSignup(true)
+                                    }}>Register</Link></p>
+                                    <p><Link to="/forgot-password" onClick={(e)=>{
+                                        e.preventDefault()
+                                        handleForgotPassword()
+                                    }}>Forgot Password?</Link></p>
+                                </div>
                             </form>
                         </div>
                     )
