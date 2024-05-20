@@ -37,7 +37,26 @@ const ResumeState = (props) => {
         return initialData
     }, [])
 
+    const [selectedData, setSelectedData] = useState(null)
     const [data, setData] = useState({})
+
+    useEffect(() => {
+        if(selectedData === null){
+            setThemeData(null)
+            setCurrentTheme('Theme1')
+            setCheckAward(false)
+            setCheckProj(false)
+            setCheckWork(false)
+            setThemeData(initialData)
+        } else{
+            setThemeData(data[selectedData].data)
+            setCurrentTheme(data[selectedData].theme)
+            setCheckAward(data[selectedData].checkAward)
+            setCheckProj(data[selectedData].checkProj)
+            setCheckWork(data[selectedData].checkWork)
+        }
+    }, [selectedData, initialData, data])
+
     const [themeData, setThemeData] = useState(initialData)
     const [checkProj, setCheckProj] = useState(false);
     const [checkWork, setCheckWork] = useState(false);
@@ -52,13 +71,6 @@ const ResumeState = (props) => {
     const [user, setUser] = useState(
         localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : {}
     )
-    const [selectedData, setSelectedData] = useState(null)
-
-    useEffect(() => {
-        if(!selectedData){
-            setThemeData(initialData)
-        }
-    }, [selectedData, initialData])
 
     useEffect(() => {
         if(signedin){
@@ -66,6 +78,9 @@ const ResumeState = (props) => {
             get(ref(db, 'users/' + user.uid)).then((snapshot) => {
                 if (snapshot.exists()) {
                     setData(snapshot.val().Data)
+                    setCheckAward(snapshot.val().checkAward)
+                    setCheckProj(snapshot.val().checkProj)
+                    setCheckWork(snapshot.val().checkWork)
                 }
             }).catch((error) => {
                 console.error(error);
@@ -79,6 +94,10 @@ const ResumeState = (props) => {
     useEffect(() => {
         if(!signedin){
             setThemeData(initialData)
+            setCurrentTheme('Theme1')
+            setCheckAward(false)
+            setCheckProj(false)
+            setCheckWork(false)
         } else{
             localStorage.setItem('user', JSON.stringify(user))
         }
@@ -96,24 +115,30 @@ const ResumeState = (props) => {
                 push(ref(db, 'users/' + user.uid + '/Data'), {
                     name: user.name + ' ' + user.data_length,
                     theme: currentTheme,
-                    data: themeData
+                    data: themeData,
+                    checkAward: checkAward,
+                    checkProj: checkProj,
+                    checkWork: checkWork
                 }).then(
                     setUser({...user, data_length: user.data_length + 1})
                 ).catch((error) => {
                     console.error(error);
                 });
-                setData({...data, [user.data_length]: {name:data[selectedData].name, theme: currentTheme, data: themeData}})
+                setData({...data, [user.data_length]: {name:user.name, theme: currentTheme, data: themeData}})
             } else{
                 set(ref(db, 'users/' + user.uid + '/Data/' + selectedData), {
                     name: data[selectedData].name,
                     theme: currentTheme,
-                    data: themeData
+                    data: themeData,
+                    checkAward: checkAward,
+                    checkProj: checkProj,
+                    checkWork: checkWork
                 }).catch((error) => {
                     console.error(error);
                 });
                 setData({...data, [selectedData]: {name:data[selectedData].name, theme: currentTheme, data: themeData}})
             }
-            setSelectedData({})
+            setSelectedData(null)
         }
     });
 

@@ -7,7 +7,7 @@ import ResumeContext from '../../Context/ResumeContext'
 
 
 export default function Navbar() {
-    const { setShowComponent, setSelectBtn, setSignup, signedin, setSignedin, setSelectedData } = useContext(ResumeContext)
+    const { setShowComponent, setSelectBtn, setSignup, signedin, setSignedin, setSelectedData, setThemeData } = useContext(ResumeContext)
     const { colorMode, toggleColorMode } = useColorMode();
     const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -19,6 +19,8 @@ export default function Navbar() {
                         setShowComponent(false)
                         setSelectBtn(true)
                         setSelectedData(null)
+                        setThemeData(null)
+                        setShowComponent(false)
                     }}>
                         <Box><img style={{ height: '44px' }} className='logo' src={logo} alt="logo" /></Box>
                     </ReachLink>
@@ -32,9 +34,17 @@ export default function Navbar() {
                                 setShowComponent(false)
                                 setSelectBtn(true)
                                 setSelectedData(null)
+                                setThemeData(null)
+                                setShowComponent(false)
                             }} px={2} py={1} rounded={'md'} _hover={{ textDecoration: 'none', bg: 'gray.200' }} to={'/'} >Home </ReachLink>
-                            <ReachLink onClick={()=>{setSelectedData(null)}} px={2} py={1} rounded={'md'} _hover={{ textDecoration: 'none', bg: 'gray.200' }} to={'/about'}> About</ReachLink>
-                            <ReachLink onClick={()=>{setSelectedData(null)}} px={2} py={1} rounded={'md'} _hover={{ textDecoration: 'none', bg: 'gray.200' }} to={'/data'}> Data</ReachLink>
+                            <ReachLink onClick={()=>{setSelectedData(null)
+                                setThemeData(null)
+                                setShowComponent(false)
+                            }} px={2} py={1} rounded={'md'} _hover={{ textDecoration: 'none', bg: 'gray.200' }} to={'/about'}> About</ReachLink>
+                            <ReachLink onClick={()=>{setSelectedData(null)
+                                setThemeData(null)
+                                setShowComponent(false)
+                            }} px={2} py={1} rounded={'md'} _hover={{ textDecoration: 'none', bg: 'gray.200' }} to={'/data'}> Data</ReachLink>
                             {
                                 !signedin && (
                                     <>
@@ -42,12 +52,16 @@ export default function Navbar() {
                                             (e)=>{
                                                 setSignup(false)
                                                 setSelectedData(null)
+                                                setThemeData(null)
+                                                setShowComponent(false)
                                             }
                                         }> Login</ReachLink>
                                         <ReachLink px={2} py={1} rounded={'md'} _hover={{ textDecoration: 'none', bg: 'gray.200' }} to={'/login'} onClick={
                                             (e)=>{
                                                 setSignup(true)
                                                 setSelectedData(null)
+                                                setThemeData(null)
+                                                setShowComponent(false)
                                             }
                                         }> Signup</ReachLink>
                                     </>
@@ -60,6 +74,8 @@ export default function Navbar() {
                                             setSignedin(false)
                                             localStorage.removeItem('user')
                                             setSelectedData(null)
+                                            setThemeData(null)
+                                            setShowComponent(false)
                                         }
                                     }> Logout</ReachLink>
                                 )
@@ -83,9 +99,18 @@ export default function Navbar() {
                 {isOpen ? (
                     <Box pb={4} display={{ md: 'none' }}>
                         <Stack as={'nav'} spacing={4}>
-                            <ReachLink onClick={()=>{setSelectedData(null)}} px={2} py={1} rounded={'md'} _hover={{ textDecoration: 'none', bg: 'gray.200' }} to={'/'} >Home </ReachLink>
-                            <ReachLink onClick={()=>{setSelectedData(null)}} px={2} py={1} rounded={'md'} _hover={{ textDecoration: 'none', bg: 'gray.200' }} to={'/about'}> About</ReachLink>
-                            <ReachLink onClick={()=>{setSelectedData(null)}} px={2} py={1} rounded={'md'} _hover={{ textDecoration: 'none', bg: 'gray.200' }} to={'/data'}> Data</ReachLink>
+                            <ReachLink onClick={()=>{setSelectedData(null)
+                                setThemeData(null)
+                                setShowComponent(false)
+                            }} px={2} py={1} rounded={'md'} _hover={{ textDecoration: 'none', bg: 'gray.200' }} to={'/'} >Home </ReachLink>
+                            <ReachLink onClick={()=>{setSelectedData(null)
+                                setThemeData(null)
+                                setShowComponent(false)
+                            }} px={2} py={1} rounded={'md'} _hover={{ textDecoration: 'none', bg: 'gray.200' }} to={'/about'}> About</ReachLink>
+                            <ReachLink onClick={()=>{setSelectedData(null)
+                                setThemeData(null)
+                                setShowComponent(false)
+                            }} px={2} py={1} rounded={'md'} _hover={{ textDecoration: 'none', bg: 'gray.200' }} to={'/data'}> Data</ReachLink>
                             {
                                 !signedin && (
                                     <>
@@ -93,12 +118,16 @@ export default function Navbar() {
                                             (e)=>{
                                                 setSignup(false)
                                                 setSelectedData(null)
+                                                setThemeData(null)
+                                                setShowComponent(false)
                                             }
                                         }> Login</ReachLink>
                                         <ReachLink px={2} py={1} rounded={'md'} _hover={{ textDecoration: 'none', bg: 'gray.200' }} to={'/login'} onClick={
                                             (e)=>{
                                                 setSignup(true)
                                                 setSelectedData(null)
+                                                setThemeData(null)
+                                                setShowComponent(false)
                                             }
                                         }> Signup</ReachLink>
                                     </>
@@ -111,6 +140,8 @@ export default function Navbar() {
                                             setSignedin(false)
                                             localStorage.removeItem('user')
                                             setSelectedData(null)
+                                            setThemeData(null)
+                                            setShowComponent(false)
                                         }
                                     }> Logout</ReachLink>
                                 )

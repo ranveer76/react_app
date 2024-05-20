@@ -14,7 +14,7 @@ import { push } from 'firebase/database';
 
 
 export default function Data() {
-    const { setThemeData, currentTheme, setCurrentTheme, setShowComponent, selectedData, setLoading, setUser, setSelectedData, data, setData, user, componentRef, themeData } = useContext(ResumeContext);
+    const { setThemeData, currentTheme, setCurrentTheme, setShowComponent, selectedData, setLoading, setUser, setSelectedData, data, setData, user, componentRef, themeData, checkAward, setCheckAward, checkProj, checkWork, setCheckProj, setCheckWork } = useContext(ResumeContext);
     const navigate = useNavigate();
     const [contextMenu, setContextMenu] = useState({ position: null, data: null });
     const [download, setDownload] = useState(false);
@@ -24,11 +24,14 @@ export default function Data() {
         document.title = 'Data - Resume Lab';
     }, []);
 
-    const showTheme = (e) => {
+    function showTheme(e){
         setShowComponent(true);
         setThemeData(data[e.target.id].data);
         setCurrentTheme(data[e.target.id].theme);
         setSelectedData(e.target.id);
+        setCheckAward(data[e.target.id].checkAward);
+        setCheckProj(data[e.target.id].checkProj);
+        setCheckWork(data[e.target.id].checkWork);
         navigate('/');
     };
 
@@ -93,7 +96,10 @@ export default function Data() {
                 push(ref(db, 'users/' + user.uid + '/Data'), {
                     name: user.name + ' ' + user.data_length,
                     theme: currentTheme,
-                    data: themeData
+                    data: themeData,
+                    checkAward: checkAward,
+                    checkProj: checkProj,
+                    checkWork: checkWork
                 }).then(
                     setUser({...user, data_length: user.data_length + 1})
                 ).catch((error) => {
@@ -104,7 +110,10 @@ export default function Data() {
                 set(ref(db, 'users/' + user.uid + '/Data/' + selectedData), {
                     name: data[selectedData].name,
                     theme: currentTheme,
-                    data: themeData
+                    data: themeData,
+                    checkAward: checkAward,
+                    checkProj: checkProj,
+                    checkWork: checkWork
                 }).catch((error) => {
                     console.error(error);
                 });
@@ -124,6 +133,9 @@ export default function Data() {
     const handleDownload = (id) => {
         setCurrentTheme(data[id].theme);
         setThemeData(data[id].data);
+        setCheckAward(data[id].checkAward);
+        setCheckProj(data[id].checkProj);
+        setCheckWork(data[id].checkWork);
         setSelectedData(id);
         setDownload(true);
     }

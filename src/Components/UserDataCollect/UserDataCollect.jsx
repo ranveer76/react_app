@@ -3,11 +3,14 @@ import './userCollectData.css'
 import { IoMdCloudUpload } from 'react-icons/io'
 import { FormControl, Input, Heading, Textarea, Button, Switch} from '@chakra-ui/react'
 import ResumeContext from '../../Context/ResumeContext'
-import { set } from 'firebase/database'
 
 
 const UserDataCollect = () => {
-    const { themeData, checkAward, setCheckAward, setThemeData, checkProj, checkWork, setCheckProj, setCheckWork } = useContext(ResumeContext)
+    const { themeData, checkAward, setCheckAward, setThemeData, checkProj, checkWork, setCheckProj, setCheckWork, initialData } = useContext(ResumeContext)
+    if (!themeData) {
+        setThemeData(initialData)
+    }
+
     const [profileImage, setProfileImage] = useState(themeData.personalData.profileImage);
 
     const handleImageUpload = (event) => {
@@ -29,16 +32,16 @@ const UserDataCollect = () => {
     const [educationArrTemplate, setEducationArrTemplate] = useState([])
     const [workArrTemplate, setWorkArrTemplate] = useState([])
     const [projectData, setProjectData] = useState({ 
-        'projectTitles': themeData.projectData.projectTitles, 
-        'projectDesc': themeData.projectData.projectDesc
+        'projectTitles': themeData.projectData ? themeData.projectData.projectTitles : {}, 
+        'projectDesc': themeData.projectData? themeData.projectData.projectDesc : {}
     })
     const [educationData, setEducationData] = useState({
-        'educationTitles': themeData.educationData.educationTitles,
-        'educationDesc': themeData.educationData.educationDesc
+        'educationTitles': themeData.educationData ? themeData.educationData.educationTitles : {},
+        'educationDesc': themeData.educationData ? themeData.educationData.educationDesc : {}
     })
     const [workData, setWorkData] = useState({
-        'workTitles': themeData.workData.workTitles,
-        'workDesc': themeData.workData.workDesc
+        'workTitles': themeData.workData ? themeData.workData.workTitles : {},
+        'workDesc': themeData.workData ? themeData.workData.workDesc : {}
     })
     const [personalData, setPersonalData] = useState({
         profileImage: themeData.personalData.profileImage,
@@ -51,12 +54,13 @@ const UserDataCollect = () => {
         skill: themeData.personalData.skill,
     })
     const [awardData, setAwardData] = useState({
-        awards: themeData.awardData.awards
+        awards: themeData.awardData ? themeData.awardData.awards : ''
     })
     // To Add Personal Data to the State
     useEffect(() => {
         setPersonalData({ ...personalData, profileImage: profileImage })
-    }, [profileImage])
+    }, [profileImage, setPersonalData, personalData])
+
     const handleChangePersonal = (e) => {
         const { name, value } = e.target
         setPersonalData({ ...personalData, [name]: value })
@@ -163,10 +167,16 @@ const UserDataCollect = () => {
     }
     useEffect(() => {
         setThemeData({ ...themeData, personalData, projectData, educationData, workData, awardData })
-    }, [personalData, projectData, educationData, workData, awardData, setThemeData])
+    }, [personalData, projectData, educationData, workData, awardData, setThemeData, themeData])
 
     const handleDeleteEducation = (index) => {
         const arr = [...educationArrTemplate];
+        if(index <= 0){
+            setEducationArrTemplate([]);
+            setEducationCount(0);
+            setEducationData({educationTitles: {}, educationDesc: {}});
+            return;
+        }
         arr.splice(index, 1);
         setEducationArrTemplate(arr);
         setEducationCount(educationCount - 1);
@@ -177,9 +187,15 @@ const UserDataCollect = () => {
         delete updatedEducationData.educationDesc[`eDescription${index + 1}`];
         setEducationData(updatedEducationData);
     }
-    
+
     const handleDeleteProject = (index) => {
         const arr = [...projArrTemplate];
+        if(index <= 0){
+            setProjArrTemplate([]);
+            setProjectCount(0);
+            setProjectData({projectTitles: {}, projectDesc: {}});
+            return;
+        }
         arr.splice(index, 1);
         setProjArrTemplate(arr);
         setProjectCount(projectCount - 1);
@@ -193,6 +209,12 @@ const UserDataCollect = () => {
     
     const handleDeleteWork = (index) => {
         const arr = [...workArrTemplate];
+        if(index <= 0){
+            setWorkArrTemplate([]);
+            setWorkCount(0);
+            setWorkData({workTitles: {}, workDesc: {}});
+            return;
+        }
         arr.splice(index, 1);
         setWorkArrTemplate(arr);
         setWorkCount(workCount - 1);
@@ -280,7 +302,7 @@ const UserDataCollect = () => {
                         <Heading as='h4' size='md' className='my-2'>
                             Projects
                         </Heading>
-                        <Switch defaultChecked={true} onChange={() => (setCheckProj(!checkProj))} colorScheme='teal' />
+                        <Switch defaultChecked={!checkProj} onChange={() => (setCheckProj(!checkProj))} colorScheme='teal' />
                     </div>
                     <hr />
                     <Button disabled={checkProj} onClick={handleProjectClick} className='my-3 w-100' colorScheme='teal' variant='solid'>Add Projects</Button>
@@ -300,7 +322,7 @@ const UserDataCollect = () => {
                         <Heading as='h4' size='md' className='my-2'>
                             Work Experience
                         </Heading>
-                        <Switch defaultChecked={true} onChange={() => (setCheckWork(!checkWork))} colorScheme='teal' />
+                        <Switch defaultChecked={!checkWork} onChange={() => (setCheckWork(!checkWork))} colorScheme='teal' />
                     </div>
                     <hr />
                     <Button disabled={checkWork} onClick={handleWorkClick} className='my-3 w-100' colorScheme='teal' variant='solid'>Add Experience</Button>
@@ -320,7 +342,7 @@ const UserDataCollect = () => {
                         <Heading as='h4' size='md' className='my-2'>
                             Awards & Achievement
                         </Heading>
-                        <Switch defaultChecked={true} onChange={() => (setCheckAward(!checkAward))} colorScheme='teal' />
+                        <Switch defaultChecked={!checkAward} onChange={() => (setCheckAward(!checkAward))} colorScheme='teal' />
                     </div>
                     <hr />
                     <FormControl isRequired className='my-2'>
